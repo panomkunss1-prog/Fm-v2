@@ -15,5 +15,4 @@ export interface BoardConfidenceState {
 export interface BoardConfidenceSnapshot {
   readonly score: number;
   readonly level: BoardConfidenceLevel;
-  readonly label: string;
 }

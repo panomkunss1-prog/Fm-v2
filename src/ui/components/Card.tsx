@@ -3,10 +3,16 @@ import type { ReactNode } from 'react';
 interface CardProps {
   readonly children: ReactNode;
   readonly className?: string;
+  /** Optional hook for tests only — never read for layout/behavior. */
+  readonly 'data-testid'?: string;
 }
 
-export function Card({ children, className }: CardProps) {
-  return <section className={className ? `fm-card ${className}` : 'fm-card'}>{children}</section>;
+export function Card({ children, className, ...rest }: CardProps) {
+  return (
+    <section className={className ? `fm-card ${className}` : 'fm-card'} {...rest}>
+      {children}
+    </section>
+  );
 }
 
 interface CardHeaderProps {

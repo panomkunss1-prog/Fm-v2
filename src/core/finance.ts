@@ -16,5 +16,4 @@ export interface FinanceState {
 export interface FinanceSnapshot {
   readonly balance: Money;
   readonly health: FinanceHealth;
-  readonly label: string;
 }

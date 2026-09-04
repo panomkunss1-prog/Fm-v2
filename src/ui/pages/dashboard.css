@@ -60,9 +60,10 @@
 
 /* ---- Season ---- */
 
-.fm-season__matchday {
-  font-size: var(--text-md);
-  font-weight: 700;
+.fm-season__progress-caption {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
 }
 
 /* ---- Next fixture ---- */

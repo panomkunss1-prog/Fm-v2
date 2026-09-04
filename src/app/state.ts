@@ -11,17 +11,22 @@ import type { Fixture } from '@core/fixture';
 import type { SeasonState } from '@core/season';
 import type { BoardConfidenceState } from '@core/board';
 import type { FinanceState } from '@core/finance';
+import type { Association } from '@core/association';
+import type { Language } from '@core/i18n';
 import { CLUBS_BY_ID, PLAYER_CLUB } from '@data/clubs';
 import { SEED_FIXTURES } from '@data/fixtures';
 import { SEED_SEASON } from '@data/season';
 import { SEED_BOARD } from '@data/board';
 import { SEED_FINANCE } from '@data/finance';
+import { PLAYER_ASSOCIATION } from '@data/association';
 
 export interface AppState {
   readonly role: Role;
+  readonly language: Language;
   readonly activeTab: TabId;
   readonly club: Club;
   readonly clubs: Readonly<Record<string, Club>>;
+  readonly association: Association;
   readonly season: SeasonState;
   readonly fixtures: readonly Fixture[];
   readonly board: BoardConfidenceState;
@@ -30,9 +35,11 @@ export interface AppState {
 
 export const initialAppState: AppState = {
   role: 'chairman',
+  language: 'th',
   activeTab: 'dashboard',
   club: PLAYER_CLUB,
   clubs: CLUBS_BY_ID,
+  association: PLAYER_ASSOCIATION,
   season: SEED_SEASON,
   fixtures: SEED_FIXTURES,
   board: SEED_BOARD,

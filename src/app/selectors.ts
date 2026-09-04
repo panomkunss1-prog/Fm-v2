@@ -4,8 +4,15 @@
  * shape the result for `src/ui/**` — they never compute a financial
  * balance, board score, or classification themselves, only assemble what
  * Systems already computed (docs/ARCHITECTURE.md section 1).
+ *
+ * View models here carry raw data (proper nouns, numbers, enum
+ * classifications) rather than pre-assembled sentences — translation
+ * lookups happen in `src/ui/` via `useTranslation()`
+ * (docs/ARCHITECTURE.md section 4), so no English/Thai copy is ever baked
+ * in at this layer.
  */
 import type { AppState } from './state';
+import type { Role } from '@core/role';
 import type { BoardConfidenceSnapshot } from '@core/board';
 import type { FinanceSnapshot } from '@core/finance';
 import { getBoardConfidenceSnapshot } from '@systems/boardSystem';
@@ -15,32 +22,27 @@ import { getSeasonSummary, type SeasonSummary } from '@systems/seasonSystem';
 import { formatKickoff } from '@core/format';
 
 export interface HeaderViewModel {
+  readonly role: Role;
+  /** Always a proper noun (league name or association name) — never translated. */
   readonly eyebrow: string;
-  readonly title: string;
-  readonly contextLine: string;
+  /** Proper noun (club name); only meaningful when `role === 'chairman'`. */
+  readonly clubName: string | undefined;
+  readonly season: SeasonSummary;
 }
 
 export function selectHeaderViewModel(state: AppState): HeaderViewModel {
   const season = getSeasonSummary(state.season);
   if (state.role === 'chairman') {
-    return {
-      eyebrow: state.club.league,
-      title: state.club.name,
-      contextLine: `Season ${season.label} · ${season.matchdayLabel}`,
-    };
+    return { role: state.role, eyebrow: state.club.league, clubName: state.club.name, season };
   }
-  return {
-    eyebrow: 'Football Association of Thailand',
-    title: 'Football Association President',
-    contextLine: `Season ${season.label} · ${season.matchdayLabel}`,
-  };
+  return { role: state.role, eyebrow: state.association.name, clubName: undefined, season };
 }
 
 export interface NextFixtureViewModel {
-  readonly homeName: string;
-  readonly awayName: string;
+  readonly homeName: string | undefined;
+  readonly awayName: string | undefined;
   readonly homeIsPlayerClub: boolean;
-  readonly matchdayLabel: string;
+  readonly matchday: number;
   readonly kickoffLabel: string;
 }
 
@@ -50,11 +52,11 @@ export function selectNextFixture(state: AppState): NextFixtureViewModel | undef
   const home = state.clubs[fixture.homeClubId];
   const away = state.clubs[fixture.awayClubId];
   return {
-    homeName: home?.name ?? 'TBD',
-    awayName: away?.name ?? 'TBD',
+    homeName: home?.name,
+    awayName: away?.name,
     homeIsPlayerClub: isHomeFixture(fixture, state.club.id),
-    matchdayLabel: `Matchday ${fixture.matchday}`,
-    kickoffLabel: formatKickoff(fixture.kickoffIso),
+    matchday: fixture.matchday,
+    kickoffLabel: formatKickoff(fixture.kickoffIso, state.language),
   };
 }
 
@@ -77,11 +79,13 @@ export function selectChairmanDashboard(state: AppState): ChairmanDashboardViewM
 }
 
 export interface FaPresidentDashboardViewModel {
+  readonly association: AppState['association'];
   readonly season: SeasonSummary;
 }
 
 export function selectFaPresidentDashboard(state: AppState): FaPresidentDashboardViewModel {
   return {
+    association: state.association,
     season: getSeasonSummary(state.season),
   };
 }

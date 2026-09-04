@@ -4,27 +4,27 @@ import { money } from '@core/money';
 
 describe('financeSystem.classifyFinanceHealth', () => {
   it('classifies a balance below 5,000,000 as critical', () => {
-    expect(classifyFinanceHealth(4_999_999)).toEqual({ health: 'critical', label: 'Critical' });
+    expect(classifyFinanceHealth(4_999_999)).toBe('critical');
   });
 
   it('classifies a negative balance as critical', () => {
-    expect(classifyFinanceHealth(-1)).toEqual({ health: 'critical', label: 'Critical' });
+    expect(classifyFinanceHealth(-1)).toBe('critical');
   });
 
   it('classifies exactly 5,000,000 as caution', () => {
-    expect(classifyFinanceHealth(5_000_000)).toEqual({ health: 'caution', label: 'Caution' });
+    expect(classifyFinanceHealth(5_000_000)).toBe('caution');
   });
 
   it('classifies just below 20,000,000 as caution', () => {
-    expect(classifyFinanceHealth(19_999_999)).toEqual({ health: 'caution', label: 'Caution' });
+    expect(classifyFinanceHealth(19_999_999)).toBe('caution');
   });
 
   it('classifies exactly 20,000,000 as healthy', () => {
-    expect(classifyFinanceHealth(20_000_000)).toEqual({ health: 'healthy', label: 'Healthy' });
+    expect(classifyFinanceHealth(20_000_000)).toBe('healthy');
   });
 
   it('classifies a large balance as healthy', () => {
-    expect(classifyFinanceHealth(100_000_000)).toEqual({ health: 'healthy', label: 'Healthy' });
+    expect(classifyFinanceHealth(100_000_000)).toBe('healthy');
   });
 });
 
@@ -34,7 +34,6 @@ describe('financeSystem.getFinanceSnapshot', () => {
     expect(getFinanceSnapshot({ balance })).toEqual({
       balance,
       health: 'healthy',
-      label: 'Healthy',
     });
   });
 
@@ -43,7 +42,6 @@ describe('financeSystem.getFinanceSnapshot', () => {
     expect(getFinanceSnapshot({ balance })).toEqual({
       balance,
       health: 'critical',
-      label: 'Critical',
     });
   });
 });

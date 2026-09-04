@@ -1,13 +1,16 @@
 import { useAppState } from '@app/appStore';
 import { selectChairmanDashboard } from '@app/selectors';
+import { useTranslation } from '@app/i18n';
 import { formatMoney, formatPercent } from '@core/format';
 import { Card, CardHeader } from '@ui/components/Card';
 import { Pill } from '@ui/components/Pill';
 import { ProgressBar } from '@ui/components/ProgressBar';
+import { BOARD_LEVEL_LABEL_KEY, FINANCE_HEALTH_LABEL_KEY } from '@ui/components/tone';
 
 /** Chairman home: real club identity, season/matchday, next fixture, board + finance snapshots. */
 export function ChairmanDashboard() {
   const state = useAppState();
+  const { t } = useTranslation();
   const vm = selectChairmanDashboard(state);
   const fixture = vm.nextFixture;
 
@@ -25,54 +28,56 @@ export function ChairmanDashboard() {
         </div>
       </Card>
 
-      <div className="fm-grid-2">
-        <Card>
-          <CardHeader title="Board Confidence" />
-          <div className="fm-metric">
-            <span className="fm-metric__value">{formatPercent(vm.board.score)}</span>
-          </div>
-          <Pill tone={vm.board.level}>{vm.board.label}</Pill>
-          <ProgressBar percent={vm.board.score} tone={vm.board.level} label="Board confidence" />
-        </Card>
+      <Card>
+        <CardHeader title={t('dashboard.boardConfidence')} />
+        <div className="fm-metric">
+          <span className="fm-metric__value">{formatPercent(vm.board.score)}</span>
+        </div>
+        <Pill tone={vm.board.level}>{t(BOARD_LEVEL_LABEL_KEY[vm.board.level])}</Pill>
+        <ProgressBar percent={vm.board.score} tone={vm.board.level} label={t('dashboard.boardConfidence')} />
+      </Card>
 
-        <Card>
-          <CardHeader title="Club Finance" />
-          <div className="fm-metric">
-            <span className="fm-metric__value fm-metric__value--money">{formatMoney(vm.finance.balance)}</span>
-          </div>
-          <Pill tone={vm.finance.health}>{vm.finance.label}</Pill>
-        </Card>
-      </div>
+      <Card data-testid="finance-card">
+        <CardHeader title={t('dashboard.clubFinance')} />
+        <div className="fm-metric">
+          <span className="fm-metric__value fm-metric__value--money" data-testid="finance-balance">
+            {formatMoney(vm.finance.balance)}
+          </span>
+        </div>
+        <Pill tone={vm.finance.health}>{t(FINANCE_HEALTH_LABEL_KEY[vm.finance.health])}</Pill>
+      </Card>
 
       <Card>
         <CardHeader
-          title="Next Fixture"
-          right={fixture ? <Pill tone="muted">{fixture.matchdayLabel}</Pill> : undefined}
+          title={t('dashboard.nextFixture')}
+          right={fixture ? <Pill tone="muted">{t('dashboard.matchdayPill', { matchday: fixture.matchday })}</Pill> : undefined}
         />
         {fixture ? (
           <>
             <div className="fm-fixture">
               <div className="fm-fixture__team" data-mine={fixture.homeIsPlayerClub}>
-                <span className="fm-fixture__tag">Home</span>
-                <strong>{fixture.homeName}</strong>
+                <span className="fm-fixture__tag">{t('dashboard.home')}</span>
+                <strong>{fixture.homeName ?? t('common.tbd')}</strong>
               </div>
-              <span className="fm-fixture__vs">vs</span>
+              <span className="fm-fixture__vs">{t('dashboard.vs')}</span>
               <div className="fm-fixture__team" data-mine={!fixture.homeIsPlayerClub}>
-                <span className="fm-fixture__tag">Away</span>
-                <strong>{fixture.awayName}</strong>
+                <span className="fm-fixture__tag">{t('dashboard.away')}</span>
+                <strong>{fixture.awayName ?? t('common.tbd')}</strong>
               </div>
             </div>
             <p className="fm-fixture__kickoff">{fixture.kickoffLabel}</p>
           </>
         ) : (
-          <p className="fm-muted">No fixture scheduled.</p>
+          <p className="fm-muted">{t('dashboard.noFixtureScheduled')}</p>
         )}
       </Card>
 
       <Card>
-        <CardHeader title="Season" right={<Pill tone="teal">{vm.season.label}</Pill>} />
-        <p className="fm-season__matchday">{vm.season.matchdayLabel}</p>
-        <ProgressBar percent={vm.season.progressPct} tone="teal" label="Season progress" />
+        <CardHeader title={t('dashboard.season')} right={<Pill tone="teal">{vm.season.label}</Pill>} />
+        <ProgressBar percent={vm.season.progressPct} tone="teal" label={t('dashboard.seasonProgressLabel')} />
+        <p className="fm-season__progress-caption">
+          {t('dashboard.seasonProgressCaption', { percent: vm.season.progressPct })}
+        </p>
       </Card>
     </div>
   );

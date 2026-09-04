@@ -1,15 +1,17 @@
 import { useAppState } from '@app/appStore';
 import { selectFaPresidentDashboard } from '@app/selectors';
+import { useTranslation } from '@app/i18n';
 import { Card, CardHeader } from '@ui/components/Card';
 import { Pill } from '@ui/components/Pill';
 import { ProgressBar } from '@ui/components/ProgressBar';
 import { EmptyState } from '@ui/components/EmptyState';
+import type { TranslationKey } from '@core/i18n';
 
-const FOCUS_AREAS: readonly string[] = [
-  'National Competitions',
-  'National Team Pipeline',
-  'Referee Development',
-  'Football Infrastructure',
+const FOCUS_AREA_KEYS: readonly TranslationKey[] = [
+  'fa.focus.nationalCompetitions',
+  'fa.focus.nationalTeamPipeline',
+  'fa.focus.refereeDevelopment',
+  'fa.focus.footballInfrastructure',
 ];
 
 /**
@@ -19,44 +21,47 @@ const FOCUS_AREAS: readonly string[] = [
  */
 export function FaPresidentDashboard() {
   const state = useAppState();
+  const { t } = useTranslation();
   const vm = selectFaPresidentDashboard(state);
 
   return (
     <div className="fm-page" data-testid="fa-president-dashboard">
       <Card className="fm-identity-card">
         <span className="fm-identity-card__crest fm-identity-card__crest--gold" aria-hidden="true">
-          FA
+          {vm.association.crestInitials}
         </span>
         <div>
-          <h2 className="fm-identity-card__name">Football Association of Thailand</h2>
-          <p className="fm-identity-card__meta">Office of the President</p>
+          <h2 className="fm-identity-card__name">{vm.association.name}</h2>
+          <p className="fm-identity-card__meta">{t('fa.officeOfPresident')}</p>
         </div>
       </Card>
 
       <Card>
-        <CardHeader title="Season" right={<Pill tone="gold">{vm.season.label}</Pill>} />
-        <p className="fm-season__matchday">{vm.season.matchdayLabel}</p>
-        <ProgressBar percent={vm.season.progressPct} tone="gold" label="Season progress" />
-        <p className="fm-muted">National competition oversight follows the same league calendar.</p>
+        <CardHeader title={t('dashboard.season')} right={<Pill tone="gold">{vm.season.label}</Pill>} />
+        <ProgressBar percent={vm.season.progressPct} tone="gold" label={t('dashboard.seasonProgressLabel')} />
+        <p className="fm-season__progress-caption">
+          {t('dashboard.seasonProgressCaption', { percent: vm.season.progressPct })}
+        </p>
+        <p className="fm-muted">{t('fa.seasonNote')}</p>
       </Card>
 
       <Card>
-        <CardHeader title="Governance Focus Areas" />
+        <CardHeader title={t('fa.governanceFocusAreas')} />
         <ul className="fm-focus-list">
-          {FOCUS_AREAS.map((area) => (
-            <li key={area} className="fm-focus-list__item">
-              <span>{area}</span>
-              <Pill tone="muted">Planned</Pill>
+          {FOCUS_AREA_KEYS.map((key) => (
+            <li key={key} className="fm-focus-list__item">
+              <span>{t(key)}</span>
+              <Pill tone="muted">{t('fa.planned')}</Pill>
             </li>
           ))}
         </ul>
       </Card>
 
       <EmptyState
-        eyebrow="FOOTBALL ASSOCIATION PRESIDENT"
-        title="President's command center"
-        description="Full national oversight tools — competitions, referees, youth pipeline and infrastructure — arrive in a later piece."
-        meta="Planned for Wave 4"
+        eyebrow={t('fa.emptyState.eyebrow')}
+        title={t('fa.emptyState.title')}
+        description={t('fa.emptyState.description')}
+        meta={t('fa.emptyState.meta')}
       />
     </div>
   );

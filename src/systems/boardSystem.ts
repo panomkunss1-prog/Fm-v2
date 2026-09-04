@@ -5,31 +5,33 @@
  * deliberately minimal stand-in for the full Board & Reputation System
  * (Wave 2, Piece 6), which must extend `classifyBoardConfidence` rather
  * than reimplement it once results/finance/decisions start feeding it.
+ *
+ * Only the classification enum is computed here — the display label is
+ * presentation copy, translated in `src/ui/` via `useTranslation()`
+ * (docs/ARCHITECTURE.md section 4), not baked into Systems output.
  */
 import type { BoardConfidenceLevel, BoardConfidenceSnapshot, BoardConfidenceState } from '@core/board';
 
 interface BoardConfidenceThreshold {
   readonly min: number;
   readonly level: BoardConfidenceLevel;
-  readonly label: string;
 }
 
 // Ordered highest-first; the first threshold the (clamped) score clears wins.
 const THRESHOLDS: readonly BoardConfidenceThreshold[] = [
-  { min: 80, level: 'strong', label: 'Strong' },
-  { min: 60, level: 'stable', label: 'Stable' },
-  { min: 40, level: 'under_pressure', label: 'Under Pressure' },
-  { min: 0, level: 'critical', label: 'Critical' },
+  { min: 80, level: 'strong' },
+  { min: 60, level: 'stable' },
+  { min: 40, level: 'under_pressure' },
+  { min: 0, level: 'critical' },
 ];
 
-export function classifyBoardConfidence(score: number): { level: BoardConfidenceLevel; label: string } {
+export function classifyBoardConfidence(score: number): BoardConfidenceLevel {
   const clamped = Math.max(0, Math.min(100, score));
   const match = THRESHOLDS.find((threshold) => clamped >= threshold.min) ?? THRESHOLDS[THRESHOLDS.length - 1];
-  return { level: match.level, label: match.label };
+  return match.level;
 }
 
 export function getBoardConfidenceSnapshot(state: BoardConfidenceState): BoardConfidenceSnapshot {
   const clamped = Math.max(0, Math.min(100, state.score));
-  const { level, label } = classifyBoardConfidence(clamped);
-  return { score: clamped, level, label };
+  return { score: clamped, level: classifyBoardConfidence(clamped) };
 }

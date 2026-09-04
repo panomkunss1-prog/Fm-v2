@@ -3,8 +3,9 @@ import { appReducer } from '@app/actions';
 import { initialAppState } from '@app/state';
 
 describe('app/actions.appReducer', () => {
-  it('starts in the chairman role on the dashboard tab', () => {
+  it('starts in the chairman role, Thai language, on the dashboard tab', () => {
     expect(initialAppState.role).toBe('chairman');
+    expect(initialAppState.language).toBe('th');
     expect(initialAppState.activeTab).toBe('dashboard');
   });
 
@@ -22,6 +23,23 @@ describe('app/actions.appReducer', () => {
     const next = appReducer(initialAppState, { type: 'nav/setTab', tab: 'finance' });
     expect(next.activeTab).toBe('finance');
     expect(next.role).toBe(initialAppState.role);
+  });
+
+  it('language/set switches the active language', () => {
+    const next = appReducer(initialAppState, { type: 'language/set', language: 'en' });
+    expect(next.language).toBe('en');
+  });
+
+  it('language/set is a no-op (same reference) when already in that language', () => {
+    const next = appReducer(initialAppState, { type: 'language/set', language: 'th' });
+    expect(next).toBe(initialAppState);
+  });
+
+  it('language/set does not touch role, activeTab, or any other field', () => {
+    const next = appReducer(initialAppState, { type: 'language/set', language: 'en' });
+    expect(next.role).toBe(initialAppState.role);
+    expect(next.activeTab).toBe(initialAppState.activeTab);
+    expect(next.club).toBe(initialAppState.club);
   });
 
   it('does not mutate the previous state object', () => {

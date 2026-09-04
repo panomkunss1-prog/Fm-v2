@@ -2,9 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { getSeasonSummary } from '@systems/seasonSystem';
 
 describe('seasonSystem.getSeasonSummary', () => {
-  it('builds a human-readable matchday label', () => {
+  it('carries the raw matchday/totalMatchdays numbers through unchanged', () => {
     const summary = getSeasonSummary({ label: '2026/27', matchday: 1, totalMatchdays: 30 });
-    expect(summary.matchdayLabel).toBe('Matchday 1 of 30');
+    expect(summary.matchday).toBe(1);
+    expect(summary.totalMatchdays).toBe(30);
     expect(summary.label).toBe('2026/27');
   });
 
