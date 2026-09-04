@@ -13,19 +13,27 @@ Status legend: `todo` / `building` / `in review` / `won` (critic-approved) /
       folders, Vitest, Playwright (iPhone 15 project), PWA manifest.
 - [x] `docs/ARCHITECTURE.md` — binding layering, Chairman/Manager boundary,
       data policy, mobile bar, verification bar.
-- [ ] `docs/QUALITY_BAR.md` — researched reference on Football Chairman Pro's
+- [x] `docs/QUALITY_BAR.md` — researched reference on Football Chairman Pro's
       actual UX, to ground every blind side-by-side critic review.
 - [x] Live progress page (Artifact) — updated at every task boundary.
+- [x] `docs/ARCHITECTURE.md` §4 — **bilingual i18n (Thai default / English
+      toggle) is now a binding, cross-cutting rule**, per user decision
+      2026-09-04. Applies to every piece from here on, including a retrofit
+      of Piece 1+2 before it can be marked won.
 
 ## Wave 1 — Shell (everything else is judged inside this frame)
 - [ ] **Piece 1: Mobile App Shell** — bottom tab bar, safe-area handling,
-      Chairman ⇄ FA President role switch, header, design tokens/theme.
-      Depends on: Wave 0.
+      Chairman ⇄ FA President role switch, header, design tokens/theme,
+      **Thai/English language toggle**. Depends on: Wave 0.
 - [ ] **Piece 2: Dashboard (Chairman home)** — real club identity, season/
       matchday state, next fixture, board-confidence snapshot, finance
       snapshot, sourced from real Core/Data/Systems (stub systems acceptable
       here, but the data must actually flow through App state, not be
-      hardcoded in the component). Depends on: Piece 1.
+      hardcoded in the component), **all copy in Thai and English via the
+      i18n system, not hardcoded strings**. Depends on: Piece 1.
+      Built once already (commit `2d39d7e`, English-only) — in critic
+      review; will need a follow-up round to add i18n regardless of that
+      review's other findings.
 
 ## Wave 2 — Authoritative systems (become protected once won)
 - [ ] **Piece 3: League & Fixtures System** — round-robin fixture
