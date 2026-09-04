@@ -107,7 +107,49 @@ correct fix is a better executive-level decision, not a tactics feature.
 - Any report claiming this gate was satisfied without it actually running is
   the same class of bug as claiming a test passed without running it.
 
-## 4. Mobile bar (iPhone 15) — non-negotiable
+## 4. Internationalization — Thai + English, every piece, from here on
+
+Decided 2026-09-04: the game is **bilingual, Thai default / English toggle**,
+matching the language switch the original prototype already sketched
+(`<button class="on">ไทย</button> <button>English</button>`, `<html
+lang="th">`). This is binding for every piece built from now on, including
+retrofitting Piece 1+2 — it is not optional polish for later.
+
+- **No hardcoded UI strings, anywhere in `src/ui/`.** Every user-facing
+  string is looked up by key through a translation function
+  (`t('dashboard.boardConfidence')`, not a literal `"Board Confidence"` in
+  JSX). A component that concatenates or hardcodes display text in Thai *or*
+  English is a layering violation, same class of bug as a component computing
+  its own balance.
+- **Where translations live, per the existing layering:**
+  - `src/core/i18n.ts` — the `Language` type (`'th' | 'en'`) and the
+    `TranslationKey` shape/type only. No strings here.
+  - `src/data/translations/th.ts` and `src/data/translations/en.ts` — the
+    actual dictionaries. This is reference data, same category as club/seed
+    lists — **both files must define the exact same set of keys**; a key
+    present in one language and missing in the other is a bug (fail the
+    build/tests on drift if practical, e.g. a unit test that diffs the two
+    key sets).
+  - Current language selection is **App-layer state**, alongside the
+    Chairman/FA-President role — persisted the same way, not a one-off
+    `useState` local to a component.
+  - `src/ui/` components call a `t()` hook/function and render its result;
+    they never hold their own copy of any string.
+- **Default language is Thai.** English is one tap away via a visible
+  toggle — placement is the builder's judgment call (the original prototype
+  put it in the header; a settings surface is also reasonable), but it must
+  not crowd the primary bottom-tab-bar navigation or the role switch, and it
+  must meet the same ≥44×44pt touch-target bar as everything else.
+- **Domain proper nouns stay as real facts regardless of language** — a club
+  named "BG Pathum United" doesn't get invented a Thai translation; only UI
+  chrome/labels/copy are translated, not real names already covered by §3's
+  data policy.
+- This is a **standing architecture rule**, not a single piece — every
+  future builder must wire new UI text through this system from the start.
+  Retrofitting Piece 1+2 for this is the next builder round for that piece,
+  regardless of what the critic's independent review finds on other axes.
+
+## 5. Mobile bar (iPhone 15) — non-negotiable
 
 - Reference device: **iPhone 15, 393×852 CSS px, DPR 3, portrait.** This is
   the only viewport that matters for "does this work" — desktop is a bonus,
@@ -121,7 +163,7 @@ correct fix is a better executive-level decision, not a tactics feature.
   avoid shipping large unused JS, keep animations at 60fps-achievable
   complexity.
 
-## 5. Protected systems
+## 6. Protected systems
 
 As of this document's creation, **nothing in this codebase is a pre-existing
 protected system** — the repository's only prior content was a static,
@@ -134,13 +176,16 @@ Once a system lands in `src/systems/` and passes its critic review, it
 not fork a parallel implementation. Record newly protected systems in
 `docs/ROADMAP.md` as each wave completes.
 
-## 6. Verification bar
+## 7. Verification bar
 
 No piece may be reported as done without, in this order:
 1. `npm run typecheck` and `npm run build` actually succeeding.
 2. `npm run test` (Vitest, unit tests on Systems logic) actually passing.
 3. `npm run test:e2e` (Playwright, iPhone 15 project) actually running
-   against the built app and producing real screenshots.
+   against the built app and producing real screenshots — **in both `th`
+   and `en`**, once §4's i18n system exists. Thai text runs measurably
+   longer/shorter than its English equivalent; a screenshot in only one
+   language does not verify the other actually fits.
 4. A critic sub-agent inspecting the **running app** (screenshots/DOM from
    Playwright), not the builder's description of it.
 
